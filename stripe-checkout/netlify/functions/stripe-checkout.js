@@ -38,8 +38,8 @@ exports.handler = async (event) => {
           quantity: 1,
         },
       ],
-      success_url: "https://yourdomain.com/tack",
-      cancel_url: "https://yourdomain.com/avbrutet",
+      success_url: "https://www.olivkassen.com/tack",
+      cancel_url: "https://www.olivkassen.com/avbrutet",
     });
 
     return {
