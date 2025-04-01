@@ -1,0 +1,12 @@
+{
+  "name": "olivkassen-stripe-functions",
+  "version": "1.0.0",
+  "description": "Stripe Checkout Function",
+  "main": "netlify/functions/stripe-checkout.js",
+  "scripts": {
+    "build": ""
+  },
+  "dependencies": {
+    "stripe": "^12.0.0"
+  }
+}
