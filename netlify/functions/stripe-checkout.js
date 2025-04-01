@@ -19,7 +19,6 @@ exports.handler = async (event) => {
 
   let plan;
 
-  // Handle bad or missing JSON
   try {
     const body = JSON.parse(event.body);
     plan = body.plan;
@@ -33,7 +32,6 @@ exports.handler = async (event) => {
     };
   }
 
-  // Define mapping of slugs to Stripe price IDs
   const priceMap = {
     "1l-monthly": "price_1QzixXClYp4p5ca6bso9AD9j",
     "1l-quarterly": "price_1QzizLClYp4p5ca6AgRnTUUi",
@@ -46,7 +44,16 @@ exports.handler = async (event) => {
     "3l-biannual": "price_1QzjCvClYp4p5ca6PSC6gPsT",
   };
 
+  const deliveryMap = {
+    "monthly": "price_1Qznq0ClYp4p5ca6cwYIZMmr",
+    "quarterly": "price_1QznqmClYp4p5ca6J41HeYSC",
+    "biannual": "price_1QznrXClYp4p5ca6tCdYPZYn",
+  };
+
   const priceId = priceMap[plan];
+  const volume = plan.split("-")[0];
+  const interval = plan.split("-")[1];
+  const deliveryPrice = deliveryMap[interval];
 
   if (!priceId) {
     return {
@@ -58,16 +65,24 @@ exports.handler = async (event) => {
     };
   }
 
+  let line_items;
+
+  if (volume === "3l") {
+    // Free shipping for 3L
+    line_items = [{ price: priceId, quantity: 1 }];
+  } else {
+    // Add delivery as second item
+    line_items = [
+      { price: priceId, quantity: 1 },
+      { price: deliveryPrice, quantity: 1 }
+    ];
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items,
       success_url: "https://olivolja.se/tack",
       cancel_url: "https://olivolja.se/avbrutet",
     });
