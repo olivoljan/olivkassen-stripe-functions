@@ -4,7 +4,17 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async (event) => {
-  const { plan } = JSON.parse(event.body);
+  let plan;
+
+  try {
+    const body = JSON.parse(event.body);
+    plan = body.plan;
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid or missing JSON body" }),
+    };
+  }
 
   // Define the mapping of plan slugs to Stripe Price IDs
   const priceMap = {
